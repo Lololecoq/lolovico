@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LOLO et VICO</title>
+  <style>
+    body {
+      background: #ffe6e6;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      color: #b30000;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .question {
+      margin-bottom: 1.2rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    textarea, input, select {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ffcccc;
+      border-radius: 8px;
+      background-color: #fff0f0;
+    }
+    button {
+      background-color: #ff4d4d;
+      color: white;
+      padding: 1rem;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      width: 100%;
+    }
+    .history {
+      margin-top: 3rem;
+      padding: 1rem;
+      border: 2px dashed #ffb3b3;
+      background: #fffafa;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>💌 LOLO et VICO 💌</h1>
+
+  <form id="dailyForm">
+    <div class="question">
+      <label for="journee">Comment s'est passée ta journée ?</label>
+      <textarea id="journee" name="journee"></textarea>
+    </div>
+
+    <div class="question">
+      <label for="tete">Tu as eu mal à la tête ?</label>
+      <select id="tete" name="tete">
+        <option>Pas du tout</option>
+        <option>Un peu</option>
+        <option>Moyen</option>
+        <option>Beaucoup</option>
+      </select>
+    </div>
+
+    <div class="question">
+      <label for="fatiguee">Tu es fatiguée ?</label>
+      <select id="fatiguee" name="fatiguee">
+        <option>Pas du tout</option>
+        <option>Un peu</option>
+        <option>Moyen</option>
+        <option>Beaucoup</option>
+      </select>
+    </div>
+
+    <div class="question">
+      <label for="seVoir">On se voit ce soir ?</label>
+      <select id="seVoir" name="seVoir" onchange="toggleExtra(this.value)">
+        <option>Oui</option>
+        <option>Non</option>
+      </select>
+    </div>
+
+    <div class="question" id="manqueContainer" style="display:none;">
+      <label for="manque">Est-ce que je te manques ?</label>
+      <textarea id="manque" name="manque"></textarea>
+    </div>
+
+    <div class="question" id="activiteContainer" style="display:block;">
+      <label for="activite">Qu'est-ce que tu veux faire ce soir ?</label>
+      <textarea id="activite" name="activite"></textarea>
+    </div>
+
+    <div class="question">
+      <label for="faim">Tu as faim ?</label>
+      <select id="faim" name="faim">
+        <option>Pas du tout</option>
+        <option>Un peu</option>
+        <option>Moyen</option>
+        <option>Beaucoup</option>
+      </select>
+    </div>
+
+    <div class="question">
+      <label for="mot">Un petit mot pour Lolo ? 💖</label>
+      <textarea id="mot" name="mot"></textarea>
+    </div>
+
+    <button type="submit">Envoyer mes réponses 💌</button>
+  </form>
+
+  <div class="history">
+    <h2>🕰️ Dernières réponses</h2>
+    <div id="historique"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('dailyForm');
+    const historique = document.getElementById('historique');
+    const manqueContainer = document.getElementById('manqueContainer');
+    const activiteContainer = document.getElementById('activiteContainer');
+
+    const toggleExtra = (value) => {
+      if (value === 'Oui') {
+        manqueContainer.style.display = 'none';
+        activiteContainer.style.display = 'block';
+      } else {
+        manqueContainer.style.display = 'block';
+        activiteContainer.style.display = 'none';
+      }
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      data.date = new Date().toLocaleString();
+
+      // Affiche dans l'historique (et l'enverra aussi plus tard à Google Sheets)
+      const rep = document.createElement('div');
+      rep.innerText = `📅 ${data.date} - ${data.journee.substring(0, 50)}...`;
+      historique.prepend(rep);
+
+      // Envoi vers Google Apps Script (à faire après config)
+      await fetch('https://script.google.com/macros/s/AKfycbx3E9mpx4NlP7xPwIKyi_B4x2P3SMip7KWftaIpShBnifn3zBgn0mEzBacaaYr6o3g/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(data)
+      });
+
+      alert('Merci mon cœur 💗');
+      form.reset();
+    });
+  </script>
+</body>
+</html>
